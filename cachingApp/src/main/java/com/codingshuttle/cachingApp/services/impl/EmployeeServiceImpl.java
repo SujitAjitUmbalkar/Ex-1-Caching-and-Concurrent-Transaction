@@ -8,6 +8,7 @@ import com.codingshuttle.cachingApp.services.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService
     private final ModelMapper modelMapper;
 
     @Override
+    @Cacheable(cacheNames = "employees",key = "#id") // if there were two parameters , then key={"#id","#parameter2")
     public EmployeeDto getEmployeeById(Long id)
     {
         log.info("Fetching employee with id: {}", id);
