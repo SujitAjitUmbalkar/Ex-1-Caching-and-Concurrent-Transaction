@@ -8,6 +8,8 @@ import com.codingshuttle.cachingApp.services.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +24,10 @@ public class EmployeeServiceImpl implements EmployeeService
 
     private final EmployeeRepository employeeRepository;
     private final ModelMapper modelMapper;
+    private final String CACHE_NAME = "employee";
 
     @Override
-    @Cacheable(cacheNames = "employees",key = "#id") // if there were two parameters , then key={"#id","#parameter2")
+    @Cacheable(cacheNames =CACHE_NAME,key = "#id") // if there were two parameters , then key={"#id","#parameter2")
     public EmployeeDto getEmployeeById(Long id)
     {
         log.info("Fetching employee with id: {}", id);
@@ -39,6 +42,7 @@ public class EmployeeServiceImpl implements EmployeeService
 
     @Override
     @Transactional
+    @CachePut(cacheNames = CACHE_NAME , key = "#result.id")     // result is return value of function (by default keyword
     public EmployeeDto createNewEmployee(EmployeeDto employeeDto)
     {
         log.info("Creating new employee with email: {}", employeeDto.getEmail());
@@ -56,6 +60,7 @@ public class EmployeeServiceImpl implements EmployeeService
     }
 
     @Override
+    @CachePut(cacheNames = CACHE_NAME , key = "#id")
     public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto)
     {
         log.info("Updating employee with id: {}", id);
@@ -80,7 +85,9 @@ public class EmployeeServiceImpl implements EmployeeService
     }
 
     @Override
-    public void deleteEmployee(Long id) {
+    @CacheEvict(cacheNames =CACHE_NAME , key = "#id")
+    public void deleteEmployee(Long id)
+    {
         log.info("Deleting employee with id: {}", id);
         boolean exists = employeeRepository.existsById(id);
         if (!exists) {
