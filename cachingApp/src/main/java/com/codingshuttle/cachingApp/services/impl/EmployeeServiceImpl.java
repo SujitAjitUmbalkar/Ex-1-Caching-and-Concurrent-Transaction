@@ -24,7 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService
 
     private final EmployeeRepository employeeRepository;
     private final ModelMapper modelMapper;
-    private final String CACHE_NAME = "employee";
+    private final String CACHE_NAME = "employees";
 
     @Override
     @Cacheable(cacheNames =CACHE_NAME,key = "#id") // if there were two parameters , then key={"#id","#parameter2")
